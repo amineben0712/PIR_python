@@ -1,0 +1,35 @@
+import numpy as np
+import cv2
+import tensorflow as tf
+
+# Chemin vers le modèle TensorFlow Lite
+model_path = '/chemin/vers/le/mobilnet_ssd_v1_coco_quant_postprocess.tflite'
+
+# Chargement du modèle TensorFlow Lite
+interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
+
+# Chargement de l'image à traiter (à remplacer par votre propre image)
+image_path = '/chemin/vers/votre/image.jpg'
+image = cv2.imread(image_path)
+image = cv2.resize(image, (300, 300))  # Redimensionner l'image selon les spécifications du modèle
+
+# Prétraitement de l'image pour l'inférence
+input_data = np.expand_dims(image, axis=0)
+input_data = (np.float32(input_data) - 127.5) / 127.5  # Normalisation des valeurs de pixels
+
+# Définition des détails de l'entrée et de la sortie du modèle
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+# Chargement des données d'entrée dans le modèle
+interpreter.set_tensor(input_details[0]['index'], input_data)
+
+# Exécution de l'inférence
+interpreter.invoke()
+
+# Récupération des résultats de l'inférence
+output_data = interpreter.get_tensor(output_details[0]['index'])
+
+# Affichage des résultats de l'inférence (à adapter selon le modèle)
+print("Résultats de l'inférence :", output_data)
